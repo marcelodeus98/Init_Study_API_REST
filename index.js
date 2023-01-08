@@ -105,15 +105,15 @@ app.put("/game/:id", (req, res) => {
         if(game != undefined){
             let {name, description, price} = req.body;
 
-            if(name != undefined){
+            if(name){
                 game.name = name;
             }
 
-            if(description != undefined){
+            if(description){
                 game.description = description;
             }
 
-            if(price != undefined){
+            if(price){
                 if(isNaN(price)){
                     res.sendStatus(404);
                 }
