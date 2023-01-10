@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nordic games</title>
+</head>
+<body>
+    <h1>Nordic game</h1>
+    <h2>Welcome to Nordic game, your site about games</h2>
+
+    <hr/>
+
+    <h2>List of games</h2>
+    <ul id="games"></ul>
+
+    <hr/>
+    <h2>Registration of new game</h2>
+    
+        <label>Name: </label>
+        <input name="name" id="name" type="text" placeholder="...">
+        <p>
+
+        <label>Description: </label>
+        <input name="description" id="description" type="text" placeholder="...">
+        <p>
+
+        <label>Year: </label>
+        <input name="year" id="year"  type="number" placeholder="...">
+        <p>
+
+        <label>Price: </label>
+        <input name="price" id="price"  type="number" placeholder="...">
+        <p>
+            
+        <button type="button" onclick="registrationGame()">Submit</button> 
+
+        <hr/>
+        <h2>Change game data</h2>
+
+        <label>ID: </label>
+        <input name="idChange" id="idChange" type="text" placeholder="..." readonly>
+        <p>
+
+
+        <label>Name: </label>
+        <input name="nameChange" id="nameChange" type="text" placeholder="...">
+        <p>
+
+        <label>Description: </label>
+        <input name="descriptionChange" id="descriptionChange" type="text" placeholder="...">
+        <p>
+
+        <label>Year: </label>
+        <input name="yearChange" id="yearChange"  type="number" placeholder="...">
+        <p>
+
+        <label>Price: </label>
+        <input name="priceChange" id="priceChange"  type="number" placeholder="...">
+        <p>
+            
+            <button type="button" onclick="changeGame()">Submit</button> 
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        let registrationGame = () => {
+            let nameInput = document.getElementById("name");
+            let descriptionInput = document.getElementById("description");
+            let yearInput = document.getElementById("year");
+            let priceInput = document.getElementById("price");
+
+            let game = {
+                name: nameInput.value,
+                description: descriptionInput.value,
+                year: yearInput.value,
+                price: priceInput.value
+            }
+
+            axios.post("http://localhost:8080/game", game).then( response => {
+                if(response.status == 200){
+                    alert("Game successfully registered!");
+                }
+            }).cath(error => {
+                console.log(error)
+            })
+        };
+
+        let deleteGame = (listItem) => {
+            let id = listItem.getAttribute("data-id");
+            
+            axios.delete("http://localhost:8080/game/"+id).then( response => {
+                alert("Game deleted successfully!")
+            }).cath(error => {
+                console.log(error)
+            });
+        };
+
+        let loadForm = (listItem) => {
+            let id = listItem.getAttribute("data-id");
+            let name = listItem.getAttribute("data-name");
+            let description = listItem.getAttribute("data-description");
+            let year = listItem.getAttribute("data-year");
+            let price = listItem.getAttribute("data-price");
+
+            let idField = document.getElementById("idChange");
+            idField.value = id;
+
+            let nameField = document.getElementById("nameChange");
+            nameField.value = name;
+
+            let descriptionField = document.getElementById("descriptionChange");
+            descriptionField.value = description;
+            
+            let yearField = document.getElementById("yearChange");
+            yearField.value = year;
+
+            let priceField = document.getElementById("priceChange");
+            priceField.value = price;
+
+        };
+
+        let changeGame = () => {
+            
+            let idInput = document.getElementById("idChange");
+            let nameInput = document.getElementById("nameChange");
+            let descriptionInput = document.getElementById("descriptionChange");
+            let yearInput = document.getElementById("yearChange");
+            let priceInput = document.getElementById("priceChange");
+
+            let id = idInput.value;
+
+            let game = {
+                name: nameInput.value,
+                description: descriptionInput.value,
+                year: yearInput.value,
+                price: priceInput.value
+            }
+
+            axios.put("http://localhost:8080/game/"+id, game).then( response => {
+                if(response.status == 200){
+                    alert("Game changed successfully!");
+                }
+            }).cath(err => {
+                console.log(err)
+            })
+
+        };
+
+        axios.get("http://localhost:8080/games").then( response => {
+            let games = response.data;
+            
+            let list = document.getElementById("games");
+
+            games.forEach( game => {
+                let item = document.createElement("li");
+
+                item.setAttribute("data-id", game.id);
+                item.setAttribute("data-name", game.name);
+                item.setAttribute("data-description", game.description);
+                item.setAttribute("data-year", game.year);
+                item.setAttribute("data-price", game.price);
+
+                item.innerHTML = "<h3>"+game.name+"</h3>" + game.description + "<br/> Year: "+ game.year +"<br/> Price - R$: " + game.price +"<p/>";
+                
+                let btnDelete = document.createElement("button");
+                btnDelete.innerHTML = "Delete";
+                btnDelete.addEventListener("click", () => deleteGame(item));
+
+                let btnChange = document.createElement("button");
+                btnChange.innerHTML = "Change";
+                btnChange.addEventListener("click", () => loadForm(item));
+
+                item.appendChild(btnDelete);
+                item.appendChild(btnChange);
+
+                list.appendChild(item);
+            });
+        }).cath( error => {
+            console.log(error);
+        }
+
+        )
+    </script>
+</body>
+</html>
